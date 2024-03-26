@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+{% block css %}
+<style>#sidebar {
+    width: 200px;
+    background-color: #f8f9fa;
+    padding: 20px;
+}
+
+#sidebar-nav .list-group-item {
+    color: #000;
+}
+
+#sidebar-nav .list-group-item.active {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.container {
+    margin-top: 20px;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+p a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+p a:hover {
+    text-decoration: underline;
+}
+
+</style>
+{% endblock css %}
+{% block body %}
+<div class="container-fluid">
+    <div class="row flex-nowrap">
+        <div class="col-auto px-0">
+            <div id="sidebar" class="collapse{% if user.is_authenticated %} show{% endif %} collapse-horizontal border-end">
+                <div id="sidebar-nav" class="list-group border-0 rounded-0 text-sm-start min-vh-100">
+                    {% if user_group == 'Superuser' %}
+                        <a href="/college_details/dashboard"
+                            class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar">
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="/college_details/add_user"
+                            class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar">
+                            <span>Add User</span>
+                        </a>
+                        <a href="/college_details/edit_user"
+                            class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar">
+                            <span>Update User</span>
+                        </a>
+                        
+                    {% elif user_group == 'Staff' %}
+                        <a href="/college_details/add_user"
+                            class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar">
+                            <span>Add User</span>
+                        </a>
+                        <a href="/college_details/edit_user"
+                            class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar">
+                            <span>Update User</span>
+                        </a>
+                        
+                    {% elif user_group == 'Regular User'%}
+                        <a href="/college_details/user_profile"
+                            class="list-group-item border-end-0 d-inline-block text-truncate"
+                            data-bs-parent="#sidebar">
+                            <span>My Course</span>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <main class="col ps-md-2 pt-2{% if not user.is_authenticated %} d-none{% endif %}">
+            <a href="#" data-bs-target="#sidebar" data-bs-toggle="collapse"
+                class="border rounded-3 p-1 text-decoration-none"><i class="bi bi-list bi-lg py-2 p-1"></i> Menu</a>
+        </main>
+        <div class="container">
+            <div class="row {% if not user.is_authenticated %}justify-content-center {% else %} justify-content-left {% endif %}">
+                <div class="col-md-8">
+            <h1>Welcome to the Homepage</h1>
+            <p>
+                Education plays a vital role in shaping individuals and societies. It empowers
+                people with knowledge, skills, <br> and values necessary for personal growth and 
+                societal development. In today's rapidly changing world, education <br> serves as 
+                a foundation for success in various aspects of life. It equips individuals
+                with critical thinking, problem-solving,<br> and communication skills, enabling 
+                them to adapt to new challenges and contribute meaningfully to their communities. <br>
+                Education is not only about acquiring academic knowledge  but also about fostering 
+                creativity, curiosity, and a lifelong <br> love for learning. It opens doors to 
+                opportunities, empowers individuals to pursue their passions, and enhances 
+                their social <br>and economic well-being. Access to quality education is essential 
+                for promoting equality, social justice, and economic <br> prosperity. By investing 
+                in education, societies can build a brighter future for generations to come.
+            </p>
+            
+            
+            
+
+            {% if user.is_authenticated %}
+            {% if user_group == 'Superuser' %}
+            <p style="font-size: 17px; color: blue; font-weight: bold;">You are logged in as Principal.</p>
+            {% elif user_group == 'Staff' %}
+            <p style="font-size: 17px; color: blue; font-weight: bold;">You are logged in as Teacher.</p>
+            {% else %}
+            <p style="font-size: 17px; color: blue; font-weight: bold;">You are logged in as {{user}}.</p>
+            {% endif %}
+            
+            {% else %}
+            <p style="font-size: 17px; color: blue; font-weight: bold;">You are not logged in. <br>
+            Kindly Log in to explore</p>
+            
+            {% endif %}
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}

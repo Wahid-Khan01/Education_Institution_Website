@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% block css %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f2f2;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        width: 80%;
+        margin: 0 auto;
+    }
+
+    h1 {
+        text-align: center;
+        margin-top: 50px;
+        color: #333;
+    }
+
+    form {
+        width: 50%;
+        margin: 0 auto;
+    }
+
+    label {
+        font-size: 18px;
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 20px;
+    }
+
+    button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+    #sidebar {
+    width: 200px;
+    background-color: #f8f9fa;
+    padding: 20px;
+}
+
+#sidebar-nav .list-group-item {
+    color: #000;
+}
+
+#sidebar-nav .list-group-item.active {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.container {
+    margin-top: 20px;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+p a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+p a:hover {
+    text-decoration: underline;
+}
+</style>
+{% endblock css %}
+{% block body %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Course</title>
+</head>
+
+<body>
+
+    <div class="container-fluid">
+        <div class="row flex-nowrap">
+            <div class="col-auto px-0">
+                <div id="sidebar" class="collapse collapse-horizontal show border-end">
+                    <div id="sidebar-nav" class="list-group border-0 rounded-0 text-sm-start min-vh-100">
+                        {% if user_group == 'Superuser' %}
+                        <a href="/college_details/dashboard"
+                            class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar">
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="/college_details/add_user"
+                            class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar">
+                            <span>Add User</span>
+                        </a>
+                        <a href="/college_details/edit_user"
+                            class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar">
+                            <span>Update User</span>
+                        </a>
+
+                        {% elif user_group == 'Staff' %}
+                        <a href="/college_details/add_user"
+                            class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar">
+                            <span>Add User</span>
+                        </a>
+                        <a href="/college_details/edit_user"
+                            class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar">
+                            <span>Update User</span>
+                        </a>
+
+                        {% elif user_group == 'Regular User'%}
+                        <a href="/college_details/user_profile"
+                            class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar">
+                            <span>My Course</span>
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <main class="col ps-md-2 pt-2">
+                <a href="#" data-bs-target="#sidebar" data-bs-toggle="collapse"
+                    class="border rounded-3 p-1 text-decoration-none">
+                    <i class="bi bi-list bi-lg py-2 p-1"></i> Menu
+                </a>
+                <div class="container">
+                    <h1>Select Course</h1>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <label for="course">Select a course:</label>
+                        <select name="course" id="course">
+                            {% for course in courses %}
+                            <option value="{{ course.0 }}">{{ course.1 }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+            </main>
+        </div>
+    </div>
+
+
+
+
+
+
+
+</body>
+{% endblock %}
+
+</html>

@@ -1,0 +1,384 @@
+{% extends 'base.html' %}
+{% block css %}
+<style>
+    .container {
+        margin-top: 50px;
+    }
+
+    h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    input[type="text"],
+    select {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    button[type="submit"] {
+        background-color: #007bff;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    button[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    th,
+    td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    .user-details-container {
+        display: none;
+    }
+
+    container {
+        margin-top: 50px;
+    }
+
+    h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    .error-message {
+        color: red;
+        margin-bottom: 10px;
+    }
+
+    label {
+        font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+    }
+
+    button[type="submit"] {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+    }
+
+    button[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container-fluid {
+        padding: 0;
+    }
+
+    #sidebar {
+        width: 200px;
+        background-color: #f8f9fa;
+        padding: 20px;
+    }
+
+    #sidebar-nav .list-group-item {
+        color: #000;
+    }
+
+    #sidebar-nav .list-group-item.active {
+        background-color: #007bff;
+        color: #fff;
+    }
+
+    .main-content {
+        padding: 20px;
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    form {
+        max-width: 400px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="date"],
+    select {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        box-sizing: border-box;
+    }
+
+    button[type="submit"] {
+        width: 100%;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    button[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+
+    p a {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    p a:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 600px) {
+        form {
+            width: 90%;
+        }
+    }
+</style>
+{% endblock css %}
+{% block body %}
+
+<div class="container-fluid">
+    <div class="row flex-nowrap">
+        <div class="col-auto px-0">
+            <div id="sidebar" class="collapse collapse-horizontal show border-end">
+                <div id="sidebar-nav" class="list-group border-0 rounded-0 text-sm-start min-vh-100">
+                    {% if user_group == 'Superuser' %}
+                    <a href="/college_details/dashboard"
+                        class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar">
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="/college_details/add_user"
+                        class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar">
+                        <span>Add User</span>
+                    </a>
+                    
+
+                    {% elif user_group == 'Staff' %}
+                    <a href="/college_details/add_user"
+                        class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar">
+                        <span>Add User</span>
+                    </a>
+                    
+
+                    {% elif user_group == 'Regular User'%}
+                    <a href="/college_details/user_profile"
+                        class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar">
+                        <span>My Course</span>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <main class="col ps-md-2 pt-2">
+            <a href="#" data-bs-target="#sidebar" data-bs-toggle="collapse"
+                class="border rounded-3 p-1 text-decoration-none">
+                <i class="bi bi-list bi-lg py-2 p-1"></i> Menu
+            </a>
+            <div class="container" >
+                <form method="GET">
+                    <label for="course">Search By Course:</label>
+                    <select name="course" id="course">
+                        <option value="">-- Select Course --</option>
+                        {% for course_key, course_value in context.COURSE_CHOICES %}
+                        <option value="{{ course_key }}">{{ course_value }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit">Search</button>
+                </form>
+                <hr>
+                <h2>Search Results:</h2>
+                {% if users %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Date of Birth</th>
+                            <th>City</th>
+                            <th>State</th>
+                            <th>Course</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr class="cell-spacing">
+                            <td>{{ user.name }} </td>
+                            <td>{{ user.email }} </td>
+                            <td>{{ user.phone }} </td>
+                            <td>{{ user.date_of_birth }} </td>
+                            <td>{{ user.city }} </td>
+                            <td>{{ user.state }} </td>
+                            <td>{{ user.course }} </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+
+                {% else %}
+                <p>No users found for the selected course.</p>
+                {% endif %}
+
+            </div><br>
+            <div class="">
+                <h1>Edit User</h1>
+                <form id="user_select_form" method="post" action="/college_details/edit_user/">
+                    {% csrf_token %}
+                    <label for="user">Select User:</label>
+                    <select name="user" id="user">
+                        <option value="" selected disabled>Select User</option>
+                        {% for user_obj in users %}
+                        <option id='user-{{ user_obj.id }}' value="{{ user_obj.id }}">{{ user_obj.name }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <div id="edit-fields">
+
+                        <div>
+                            <label for="name">Name:</label>
+                            <input type="text" name="name" id="name"><br>
+                        </div>
+                        <div>
+                            <label for="email">Email:</label>
+                            <input type="text" name="email" id="email"><br>
+                        </div>
+                        <div>
+                            <label for="phone">Phone:</label>
+                            <input type="text" name="phone" id="phone" pattern="[0-9]{10}"><br>
+                        </div>
+                        <div>
+                            <label for="dob">Date of Birth:</label>
+                            <input type="text" name="date_of_birth" id="date_of_birth" placeholder="DD/MM/YYYY"><br>
+                        </div>
+                        <label for="city">Select City:</label>
+                        <select name="city" id="city">
+                            <option value="" selected disabled>Select City</option>
+                            {% for city in india_cities %}
+                            <option value="{{ city.name }}">{{ city.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="state">Select State:</label>
+                        <select name="state" id="state">
+                            <option value="" selected disabled>Select State</option>
+                            {% for state in indian_states %}
+                            <option value="{{ state.name }}">{{ state.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <label for="course">Select Course:</label>
+                        <select name="course" id="course">
+                            <option value="" selected disabled>Select Course</option>
+                            {% for course_key, course_value in context.COURSE_CHOICES %}
+                            <option value="{{ course_key }}">{{ course_value }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <button type="submit">Submit</button>
+                </form>
+
+
+            </div>
+        </main>
+    </div>
+</div>
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+    $(function () {
+        $("#date_of_birth").datepicker();
+    });
+    document.getElementById("user_select_form").onsubmit = function (event) {
+        var form = document.getElementById("user_select_form");
+        var name = form.elements["name"].value;
+        var email = form.elements["email"].value;
+        var phone = form.elements["phone"].value;
+        var dateOfBirth = form.elements["date_of_birth"].value;
+        var city = form.elements["city"].value;
+        var state = form.elements["state"].value;
+        var course = form.elements["course"].value;
+
+        if (!name && !email && !phone && !dateOfBirth && !city && !state && !course) {
+            event.preventDefault(); // Prevent form submission
+            alert("Please fill in at least one field."); // Show alert message
+        }
+    };
+
+    {% if messages %}
+    $(document).ready(function(){
+        var success = false;
+        {% for message in messages %}
+        {% if message.tags == 'success' %}
+        success = true;
+        {% endif %}
+        {% endfor %}
+        if (success) {
+            alert("Successfully updated!"); // Show the pop-up
+        }
+    });
+    {% endif %}
+    
+
+</script>
+
+
+
+
+{% endblock body %}
