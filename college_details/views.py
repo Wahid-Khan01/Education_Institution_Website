@@ -191,7 +191,7 @@ def signup(request):
         return redirect('login1') 
     return render(request, 'signup.html')
 
-
+@login_required
 def contact_us(request):
     if request.method == 'POST':
         form = ContactForm(request.POST)
@@ -203,7 +203,7 @@ def contact_us(request):
         form = ContactForm()
     return render(request, 'contact_us.html', {'form': form})
 
-
+@login_required
 def buy_course(request):
     # Assuming you have a model named Course with fields 'name', 'fees', and 'tenure'
     courses = Course.objects.all()  # Query all courses from the database
