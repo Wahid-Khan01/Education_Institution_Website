@@ -127,6 +127,7 @@ def edit_user(request):
 
     return render(request, 'edit_user.html', {'users': users, 'indian_states': indian_states, 'india_cities': india_cities, 'context': context, 'success': success})
 
+@login_required
 def delete_user(request):
 
     if request.method == 'GET':
