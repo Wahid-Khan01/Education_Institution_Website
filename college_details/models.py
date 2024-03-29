@@ -36,3 +36,24 @@ class UserProfile2(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
+
+
+
+class Course(models.Model):
+    name = models.CharField(max_length=100)
+    fees = models.DecimalField(max_digits=10, decimal_places=2)
+    tenure = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+class Contact(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    phone = models.CharField(max_length=15)
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    course = models.CharField(max_length=100)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+

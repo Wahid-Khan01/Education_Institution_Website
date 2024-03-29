@@ -204,14 +204,20 @@
                         class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar">
                         <span>Add User</span>
                     </a>
-                    
+                    <a href="/college_details/delete_user"
+                            class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar">
+                            <span>Delete User</span>
+                        </a>
 
                     {% elif user_group == 'Staff' %}
                     <a href="/college_details/add_user"
                         class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar">
                         <span>Add User</span>
                     </a>
-                    
+                    <a href="/college_details/delete_user"
+                            class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar">
+                            <span>Delete User</span>
+                        </a>
 
                     {% elif user_group == 'Regular User'%}
                     <a href="/college_details/user_profile"
@@ -263,6 +269,7 @@
                             <td>{{ user.city }} </td>
                             <td>{{ user.state }} </td>
                             <td>{{ user.course }} </td>
+                            
                         </tr>
                         {% endfor %}
 

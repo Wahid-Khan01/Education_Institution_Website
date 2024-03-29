@@ -1,18 +1,17 @@
 from django.shortcuts import render,redirect, get_object_or_404
 from django.http import HttpResponse
-from . models import IndianStates, UserProfile2, IndiaCities
+from . models import IndianStates, UserProfile2, IndiaCities, Course, Contact
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from datetime import datetime
-
+from .forms import ContactForm
 
 
 def index(request):
     return render(request, 'college_details/index.html')
-
 
 
 def select_course(request):
@@ -43,8 +42,6 @@ def add_user(request):
         context = {'COURSE_CHOICES': UserProfile2.COURSE_CHOICES, 'indian_states':indian_states, 'india_cities':india_cities}
         return render(request, 'add_user.html', context)
     
-
-
 
 def logout_view(request):
     logout(request)
@@ -130,6 +127,27 @@ def edit_user(request):
 
     return render(request, 'edit_user.html', {'users': users, 'indian_states': indian_states, 'india_cities': india_cities, 'context': context, 'success': success})
 
+def delete_user(request):
+
+    if request.method == 'GET':
+        course = request.GET.get('course')
+        if course:
+            users = UserProfile2.objects.filter(course=course)
+        else:
+            users = None
+    else:
+        users = None
+    return render(request, 'delete_user.html', {'users': users, 'COURSE_CHOICES': UserProfile2.COURSE_CHOICES})
+
+def delete_user_action(request, user_id):
+    if request.method == 'DELETE':
+        user = get_object_or_404(UserProfile2, pk=user_id)
+        user.delete()
+        return JsonResponse({'message': 'User deleted successfully'})
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
 @login_required
 def user_profile(request):
     user_name = request.user.username
@@ -173,4 +191,19 @@ def signup(request):
     return render(request, 'signup.html')
 
 
+def contact_us(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            form.save()  # Save the form data to the database
+            # Redirect to a thank you page or show a success message
+            return redirect('contact_us')
+    else:
+        form = ContactForm()
+    return render(request, 'contact_us.html', {'form': form})
 
+
+def buy_course(request):
+    # Assuming you have a model named Course with fields 'name', 'fees', and 'tenure'
+    courses = Course.objects.all()  # Query all courses from the database
+    return render(request, 'buy_course.html', {'courses': courses})

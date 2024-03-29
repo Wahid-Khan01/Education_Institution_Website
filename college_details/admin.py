@@ -1,7 +1,7 @@
 from django.contrib import admin
 import csv
 from django.http import HttpResponse
-from .models import  IndianStates,UserProfile2,IndiaCities
+from .models import  IndianStates,UserProfile2,IndiaCities,Course,Contact
 
 def export_as_csv(modeladmin, request, queryset):
     response = HttpResponse(content_type='text/csv')
@@ -24,6 +24,15 @@ class UserProfiles2(admin.ModelAdmin):
     actions = [export_as_csv]
 
 
+class Contacts(admin.ModelAdmin):
+    list_display=['name','email','phone','city','state','course','message','created_at']
+    actions = [export_as_csv]
+
+class Courses(admin.ModelAdmin):
+    list_display=['name','fees','tenure']
+
 admin.site.register(UserProfile2, UserProfiles2)
 admin.site.register(IndianStates)
 admin.site.register(IndiaCities)
+admin.site.register(Course,Courses)
+admin.site.register(Contact, Contacts)

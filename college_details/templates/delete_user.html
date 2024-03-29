@@ -1,0 +1,261 @@
+{% extends 'base.html' %}
+{% block css %}
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<style>
+    /* Custom CSS */
+    .container {
+        margin-top: 50px;
+    }
+
+    h1 {
+        margin-bottom: 20px;
+    }
+
+    form {
+        margin-bottom: 20px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th,
+    td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    .btn-delete {
+        color: #fff;
+        background-color: #dc3545;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+    }
+
+    .btn-delete:hover {
+        background-color: #c82333;
+    }
+
+    #sidebar {
+    width: 200px;
+    background-color: #f8f9fa;
+    padding: 20px;
+}
+
+#sidebar-nav .list-group-item {
+    color: #000;
+}
+
+#sidebar-nav .list-group-item.active {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.container {
+    margin-top: 20px;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+p a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+p a:hover {
+    text-decoration: underline;
+}
+
+</style>
+{% endblock %}
+
+{% block body %}
+
+
+
+<div class="container-fluid">
+    <div class="row flex-nowrap">
+        <div class="col-auto px-0">
+            <div id="sidebar" class="collapse collapse-horizontal show border-end">
+                <div id="sidebar-nav" class="list-group border-0 rounded-0 text-sm-start min-vh-100">
+                    {% if user_group == 'Superuser' %}
+                        <a href="/college_details/dashboard"
+                            class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar">
+                            <span>Dashboard</span>
+                        </a>
+                        
+                        <a href="/college_details/edit_user"
+                            class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar">
+                            <span>Update User</span>
+                        </a>
+                        <a href="/college_details/add_user"
+                        class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar">
+                        <span>Add User</span>
+                    </a>
+                        
+                    {% elif user_group == 'Staff' %}
+                        
+                        <a href="/college_details/edit_user"
+                            class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar">
+                            <span>Update User</span>
+                        </a>
+                        <a href="/college_details/add_user"
+                        class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar">
+                        <span>Add User</span>
+                    </a>
+                        
+                    {% elif user_group == 'Regular User'%}
+                        <a href="/college_details/user_profile"
+                            class="list-group-item border-end-0 d-inline-block text-truncate"
+                            data-bs-parent="#sidebar">
+                            <span>My Course</span>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <main class="col ps-md-2 pt-2">
+            <a href="#" data-bs-target="#sidebar" data-bs-toggle="collapse" class="border rounded-3 p-1 text-decoration-none">
+                <i class="bi bi-list bi-lg py-2 p-1"></i> Menu
+            </a>
+            
+<div class="container">
+    <h1>Delete Users</h1>
+    <form id="course_select_form">
+        <div class="form-group">
+            <label for="course">Select Course:</label>
+            <select class="form-control" name="course" id="course">
+                <option value="">-- Select Course --</option>
+                {% for course_choice in COURSE_CHOICES %}
+                <option value="{{ course_choice.0 }}">{{ course_choice.1 }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+    <hr>
+    <h2>Search Results:</h2>
+    {% if users %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Date of Birth</th>
+                <th>City</th>
+                <th>State</th>
+                <th>Course</th>
+                <th>Action</th> <!-- New column for delete button -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.phone }}</td>
+                <td>{{ user.date_of_birth }}</td>
+                <td>{{ user.city }}</td>
+                <td>{{ user.state }}</td>
+                <td>{{ user.course }}</td>
+                <td>
+                    <button class="btn btn-delete" onclick="confirmDelete('{{ user.id }}')">Delete</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No users found for the selected course.</p>
+    {% endif %}
+</div>
+
+
+        </main>
+    </div>
+</div>
+
+
+
+
+
+
+
+<script>
+    document.getElementById("course_select_form").onchange = function () {
+        var course = document.getElementById("course").value;
+        if (course) {
+            fetch(`/college_details/delete_user_action/?course=${course}`, {
+                method: 'GET'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Clear existing user list
+                    document.getElementById("user_list").innerHTML = "";
+                    // Populate user list
+                    data.forEach(user => {
+                        var userRow = document.createElement("div");
+                        userRow.innerHTML = `<p>${user.name} (${user.email}) <button onclick="confirmDelete(${user.id})">Delete</button></p>`;
+                        document.getElementById("user_list").appendChild(userRow);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        } else {
+            // If no course is selected, clear the user list
+            document.getElementById("user_list").innerHTML = "";
+        }
+    };
+
+    function confirmDelete(userId) {
+        if (confirm("Are you sure you want to delete this user?")) {
+            fetch(`/college_details/delete_user_action/${userId}/`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken') // Include CSRF token
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        // If deletion is successful, show a success message
+                        alert("User deleted successfully.");
+                        // Reload the page
+                        window.location.reload();
+                    } else {
+                        console.error('Failed to delete user');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    }
+
+    // Function to get CSRF token from cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }</script>
+{% endblock %}

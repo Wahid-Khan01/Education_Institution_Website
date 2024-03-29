@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block body %}
+<div class="container">
+    <h1>Course Details</h1>
+    {% for course in courses %}
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">{{ course.name }}</h5>
+            <p class="card-text">Fees: ${{ course.fees }}</p>
+            <p class="card-text">Tenure: {{ course.tenure }}</p>
+            <a href="{% url 'contact_us' %}" class="btn btn-primary">Enroll</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

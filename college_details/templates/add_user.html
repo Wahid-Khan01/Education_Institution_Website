@@ -95,12 +95,20 @@
                             class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar">
                             <span>Update User</span>
                         </a>
+                        <a href="/college_details/delete_user"
+                            class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar">
+                            <span>Delete User</span>
+                        </a>
                         
                     {% elif user_group == 'Staff' %}
                         
                         <a href="/college_details/edit_user"
                             class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar">
                             <span>Update User</span>
+                        </a>
+                        <a href="/college_details/delete_user"
+                            class="list-group-item border-end-0 d-inline-block text-truncate" data-bs-parent="#sidebar">
+                            <span>Delete User</span>
                         </a>
                         
                     {% elif user_group == 'Regular User'%}

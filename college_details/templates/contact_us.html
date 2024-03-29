@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+{% block css %}
+<style>
+/* Custom CSS for contact form */
+.container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    font-weight: bold;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.btn-submit {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-submit:hover {
+    background-color: #0056b3;
+}
+
+.popup-container {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    width: 100%;
+    height: 100%;
+}
+
+.popup {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+/* CSS for each field */
+
+/* Label style */
+label {
+    font-weight: bold;
+}
+
+/* Text input style */
+input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+/* Email input style */
+input[type="email"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+/* Phone input style */
+input[type="tel"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+/* City input style */
+select[name="city"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+/* State input style */
+select[name="state"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+/* Course input style */
+select[name="course"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+/* CSS for form fields */
+.form-group {
+    margin-bottom: 20px;
+}
+
+/* CSS for input fields */
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* CSS for the message textarea */
+#id_message {
+    width: 100%;
+    height: 150px; /* Adjust height as needed */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical; /* Allow vertical resizing */
+}
+
+/* CSS for submit button */
+.btn-primary {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+/* CSS for success message */
+#success-message {
+    display: none;
+    color: green;
+    margin-top: 10px;
+}
+
+/* CSS for error message */
+#error-message {
+    display: none;
+    color: red;
+    margin-top: 10px;
+}
+
+</style>
+{% endblock %}
+{% block body %}
+<div class="container mt-5">
+    <h1>Contact Us</h1>
+    <form method="post" id="contactForm">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+   
+</div>
+<div class="popup-container" id="successPopup">
+    <div class="popup">
+        <p>Form submitted successfully!</p>
+        <button id="closePopupBtn">Close</button>
+    </div>
+</div>
+
+<script>
+   // JavaScript
+document.getElementById("contactForm").addEventListener("submit", function(event) {
+    // Prevent the default form submission
+    event.preventDefault();
+
+    // Submit the form data via AJAX
+    fetch(this.action, {
+        method: this.method,
+        body: new FormData(this),
+    })
+    .then(response => {
+        if (response.ok) {
+            // If form submitted successfully, display the popup
+            document.getElementById("successPopup").style.display = "block";
+            // Clear the form fields if needed
+            this.reset();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+});
+
+// Close the popup when the close button is clicked
+document.getElementById("closePopupBtn").addEventListener("click", function() {
+    document.getElementById("successPopup").style.display = "none";
+});
+
+    </script>
+{% endblock %}
