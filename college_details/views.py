@@ -240,6 +240,20 @@ def signup(request):
         return redirect('login1') 
     return render(request, 'signup.html')
 
+<<<<<<< HEAD
+=======
+@login_required
+def contact_us(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            form.save()  # Save the form data to the database
+            # Redirect to a thank you page or show a success message
+            return redirect('contact_us')
+    else:
+        form = ContactForm()
+    return render(request, 'contact_us.html', {'form': form})
+>>>>>>> 2910db18d05fada45a71b1c8b482f02d50ddd32c
 
 @login_required
 def buy_course(request):
