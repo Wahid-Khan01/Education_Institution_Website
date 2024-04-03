@@ -46,6 +46,39 @@ p a:hover {
     text-decoration: underline;
 }
 
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+.profile-info {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 20px;
+}
+
+.profile-item {
+    margin-bottom: 15px;
+}
+
+.profile-item label {
+    font-weight: bold;
+}
+
+.profile-item p {
+    margin: 0;
+}
+
+/* Optional: Add additional styling as desired */
+
+
+
     </style>
 {% endblock css %}
 {% block body %}
@@ -80,11 +113,7 @@ p a:hover {
                         </a>
                         
                     {% elif user_group == 'Regular User'%}
-                        <a href="/college_details/user_profile"
-                            class="list-group-item border-end-0 d-inline-block text-truncate"
-                            data-bs-parent="#sidebar">
-                            <span>My Course</span>
-                        </a>
+                        
                         <a href="/college_details/buy_course"
                             class="list-group-item border-end-0 d-inline-block text-truncate"
                             data-bs-parent="#sidebar">
@@ -100,15 +129,38 @@ p a:hover {
             </a>
             <div class="container">
                 <h2>User Profile</h2>
-<p>Welcome, {{ user.username }}!</p>
-<p>Name: {{ user_profile.name }}</p>
-<p>Email: {{ user.email }}</p>
-<p>Phone: {{ user_profile.phone }}</p>
-<p>Date of Birth: {{ user_profile.date_of_birth }}</p>
-<p>City: {{ user_profile.city }}</p>
-<p>State: {{ user_profile.state }}</p>
-<p>Course: {{ user_profile.course }}</p>
+                <div class="profile-info">
+                    <div class="profile-item">
+                        <label>Name:</label>
+                        <p>{{ user_profile.name }}</p>
+                    </div>
+                    <div class="profile-item">
+                        <label>Email:</label>
+                        <p>{{ user.email }}</p>
+                    </div>
+                    <div class="profile-item">
+                        <label>Phone:</label>
+                        <p>{{ user_profile.phone }}</p>
+                    </div>
+                    <div class="profile-item">
+                        <label>Date of Birth:</label>
+                        <p>{{ user_profile.date_of_birth }}</p>
+                    </div>
+                    <div class="profile-item">
+                        <label>City:</label>
+                        <p>{{ user_profile.city }}</p>
+                    </div>
+                    <div class="profile-item">
+                        <label>State:</label>
+                        <p>{{ user_profile.state }}</p>
+                    </div>
+                    <div class="profile-item">
+                        <label>Course:</label>
+                        <p>{{ user_profile.course }}</p>
+                    </div>
                 </div>
+            </div>
+            
         </main>
     </div>
 </div>

@@ -6,11 +6,28 @@
     <div class="card mb-3">
         <div class="card-body">
             <h5 class="card-title">{{ course.name }}</h5>
-            <p class="card-text">Fees: ${{ course.fees }}</p>
+            <p class="card-text">Fees: Rs.{{ course.fees }}</p>
             <p class="card-text">Tenure: {{ course.tenure }}</p>
-            <a href="{% url 'contact_us' %}" class="btn btn-primary">Enroll</a>
+            <a href="{% url 'contact_us' %}?course={{ course.name }}" class="btn btn-primary">Enroll</a>
         </div>
     </div>
     {% endfor %}
 </div>
+
+
+{% block script %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var urlParams = new URLSearchParams(window.location.search);
+    var courseName = urlParams.get('course');
+    if (courseName) {
+        var courseInput = document.getElementById('course');
+        if (courseInput) {
+            courseInput.value = courseName;
+        }
+    }
+});
+</script>
+{% endblock %}
+
 {% endblock %}

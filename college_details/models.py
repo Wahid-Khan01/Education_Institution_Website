@@ -53,7 +53,7 @@ class Contact(models.Model):
     phone = models.CharField(max_length=15)
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
-    course = models.CharField(max_length=100)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, null=True, blank=True)
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 

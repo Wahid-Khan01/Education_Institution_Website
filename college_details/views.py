@@ -7,7 +7,15 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from datetime import datetime
-from .forms import ContactForm
+from .forms import  UserProfileForm
+from django.core.paginator import Paginator
+from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+
+
+import csv
 
 
 def index(request):
@@ -49,84 +57,125 @@ def logout_view(request):
 
 @login_required
 def dashboard(request):
-    if request.method == 'GET':
-        course = request.GET.get('course')
-        if course:
-            users = UserProfile2.objects.filter(course=course)
-        else:
-            users = None
-    else:
-        users = None
-    return render(request, 'dashboard.html', {'COURSE_CHOICES': UserProfile2.COURSE_CHOICES, 'users': users})
+    users = UserProfile2.objects.all().order_by('name')
+
+    paginator = Paginator(users, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'dashboard.html', {'page_obj': page_obj})
+
+def download_pdf(request):
+    # Fetch data from the database
+    users = UserProfile2.objects.all()
+
+    # Generate PDF content
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="example.pdf"'
+    doc = SimpleDocTemplate(response, pagesize=letter)
+    
+    # Define table data and style
+    data = [["Name", "Email", "Phone", "Date of Birth", "City", "State", "Course"]]
+    for user in users:
+        data.append([user.name, user.email, user.phone, user.date_of_birth, user.city, user.state, user.course])
+
+    table = Table(data)
+    table.setStyle(TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.lightblue),
+                               ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                               ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                               ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                               ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                               ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                               ('GRID', (0, 0), (-1, -1), 1, colors.black)]))
+
+    # Add table to the PDF document
+    doc.build([table])
+    return response
+
+
+def download_csv(request):
+    users = UserProfile2.objects.all().order_by('name')
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="user_profiles.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Name', 'Email', 'Phone', 'Date of Birth', 'City', 'State', 'Course'])
+    for user in users:
+        # Convert date_of_birth to string in format 'Month Day, Year'
+        date_of_birth_str = user.date_of_birth.strftime('%B %d, %Y')
+        writer.writerow([
+            user.name,
+            user.email,
+            user.phone,
+            date_of_birth_str,
+            user.city,
+            user.state,
+            user.course
+        ])
+
+    return response
+
+
+def download_csv(request):
+    # Fetch data from your database
+    users = UserProfile2.objects.all()
+
+    # Generate CSV content
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="user_data.csv"'
+    writer = csv.writer(response)
+    
+    # Write header row
+    writer.writerow(['Name', 'Email', 'Phone', 'Date of Birth', 'City', 'State', 'Course'])  # Add more fields as needed
+
+    # Write data rows
+    for user in users:
+        writer.writerow([user.name, user.email, user.phone])  # Add more fields as needed
+
+    return response
+
 
 
 @login_required
-def edit_user(request):
+def edit_user_list(request):
+    users = UserProfile2.objects.all().order_by('name')
+    paginator = Paginator(users, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'edit_user_list.html', {'page_obj': page_obj})
+
+@login_required
+def edit_user(request, user_id=None):
     if not request.user.is_superuser and not request.user.is_staff:
         return redirect('home')  
-    
-    users = None
-    indian_states = IndianStates.objects.all()
-    india_cities = IndiaCities.objects.all()
-    context = {'COURSE_CHOICES': UserProfile2.COURSE_CHOICES}
-    success = False
-    
-    if request.method == 'GET':
-        course = request.GET.get('course')
-        if course:
-            users = UserProfile2.objects.filter(course=course)
-    elif request.method == 'POST':
-        user_id = request.POST.get('user')
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        phone = request.POST.get('phone')
-        date_of_birth_str = request.POST.get('date_of_birth')
 
-        city_name = request.POST.get('city') 
-        state_name = request.POST.get('state') 
-        course = request.POST.get('course')
-
-        if not user_id:
-            messages.warning(request, 'No user selected.')
-            return redirect('edit_user')
-
+    if user_id:
+        # If user ID is provided, fetch the user object based on the user_id
         user = get_object_or_404(UserProfile2, pk=user_id)
 
-        date_of_birth = None
+        if request.method == 'POST':
+            # If form is submitted, handle form submission and update user details
+            form = UserProfileForm(request.POST, instance=user)
+            if form.is_valid():
+                form.save()
+                return redirect('edit_user_list')  # Redirect to user profile page or any other page
+        else:
+            # If method is GET or form is not submitted, pre-fill the form with existing user details
+            form = UserProfileForm(instance=user)
 
-        if date_of_birth_str:
-            try:
-                date_of_birth = datetime.strptime(date_of_birth_str, "%d/%m/%Y").strftime("%Y-%m-%d")
-            except ValueError:
-                messages.error(request, 'Invalid date format. Date of birth must be in DD/MM/YYYY format.')
-                return redirect('edit_user')
+        return render(request, 'edit_user.html', {'form': form})
+    
+    else:
+        # If user ID is not provided, display a list of users to select from
+        users = UserProfile2.objects.all().order_by('name')
+        paginator = Paginator(users, 10)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        return render(request, 'edit_user_list.html', {'page_obj': page_obj})
+    
 
-        if not any([name, email, phone, date_of_birth, city_name, state_name, course]):
-            messages.warning(request, 'No changes were made as all fields were empty.')
-            return redirect('edit_user') 
 
-        if name:
-            user.name = name
-        if email:
-            user.email = email
-        if phone:
-            user.phone = phone
-        if date_of_birth:
-            user.date_of_birth = date_of_birth
-        if city_name:
-            user.city = city_name 
-        if state_name:
-            user.state = state_name
-        if course:
-            user.course = course
-
-        user.save()
-        success = True
-        messages.success(request, 'User profile updated successfully.')
-        return redirect('edit_user') 
-
-    return render(request, 'edit_user.html', {'users': users, 'indian_states': indian_states, 'india_cities': india_cities, 'context': context, 'success': success})
-
+@login_required
 def delete_user(request):
 
     if request.method == 'GET':
@@ -160,6 +209,7 @@ def user_profile(request):
 
     return render(request, 'user_profile.html', {'user_profile': user_profile})
 
+
 def login1(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -191,19 +241,40 @@ def signup(request):
     return render(request, 'signup.html')
 
 
-def contact_us(request):
-    if request.method == 'POST':
-        form = ContactForm(request.POST)
-        if form.is_valid():
-            form.save()  # Save the form data to the database
-            # Redirect to a thank you page or show a success message
-            return redirect('contact_us')
-    else:
-        form = ContactForm()
-    return render(request, 'contact_us.html', {'form': form})
-
-
+@login_required
 def buy_course(request):
-    # Assuming you have a model named Course with fields 'name', 'fees', and 'tenure'
-    courses = Course.objects.all()  # Query all courses from the database
+    courses = Course.objects.all()
+    
     return render(request, 'buy_course.html', {'courses': courses})
+
+@login_required
+def contact_us(request):
+    course_name = None
+    
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        city = request.POST.get('city')
+        state = request.POST.get('state')
+        course_name = request.POST.get('course')  # Retrieve course name from the form
+        message = request.POST.get('message')
+        
+        # Get the course object based on the course name
+        try:
+            selected_course = Course.objects.get(name=course_name)
+        except Course.DoesNotExist:
+            selected_course = None
+        
+        # Create the contact object with the retrieved course
+        contact = Contact(name=name, email=email, phone=phone, city=city, state=state, message=message, course=selected_course)
+        contact.save()
+        messages.success(request, 'Successful')
+        
+        return redirect('contact_us')
+    else:
+        course_name = request.GET.get('course')  # Retrieve course name from the URL
+        cities = IndiaCities.objects.all()
+        states = IndianStates.objects.all()
+        return render(request, 'contact_us.html', {'user': request.user, 'selected_course_name': course_name, 'cities':cities, 'states':states})
+
