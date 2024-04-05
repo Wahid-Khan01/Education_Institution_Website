@@ -116,24 +116,6 @@ def download_csv(request):
     return response
 
 
-def download_csv(request):
-    # Fetch data from your database
-    users = UserProfile2.objects.all()
-
-    # Generate CSV content
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="user_data.csv"'
-    writer = csv.writer(response)
-    
-    # Write header row
-    writer.writerow(['Name', 'Email', 'Phone', 'Date of Birth', 'City', 'State', 'Course'])  # Add more fields as needed
-
-    # Write data rows
-    for user in users:
-        writer.writerow([user.name, user.email, user.phone])  # Add more fields as needed
-
-    return response
-
 
 
 @login_required
